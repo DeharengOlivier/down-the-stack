@@ -276,7 +276,7 @@ async function hkdfExpand(hash: string, prk: Uint8Array, info: Uint8Array, lengt
   const hashLen = hash === 'SHA-384' ? 48 : 32;
   const n = Math.ceil(length / hashLen);
   const out = new Uint8Array(n * hashLen);
-  let previous = new Uint8Array(0);
+  let previous: Uint8Array = new Uint8Array(0);
   for (let i = 1; i <= n; i++) {
     const input = new Uint8Array(previous.length + info.length + 1);
     input.set(previous, 0);
