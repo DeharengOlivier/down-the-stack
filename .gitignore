@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.DS_Store
+*.log
+
+# The raw capture holds other applications' traffic and the real hardware
+# addresses. Only the filtered, anonymised fixture is published.
+fixtures/session.pcap
+fixtures/session.meta.json
