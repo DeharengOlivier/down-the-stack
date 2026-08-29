@@ -90,8 +90,8 @@ function concat(parts: Uint8Array[]): Uint8Array {
 function buildStack(frame: CapturedFrame, session: CapturedSession, topLabel: string): LayerView[] {
   const views: LayerView[] = [];
   const headers = frame.headers;
-  const eth = headers[0]!;
-  const ip = headers[1]!;
+  const eth = headers[0];
+  const ip = headers[1];
   const transport = headers[2];
   const application = headers[3];
 
@@ -231,9 +231,9 @@ function buildRequestStack(
   });
 
   const headers = carrierFrame.headers;
-  const ip = headers[1]!;
-  const tcp = headers[2]!;
-  const ipStart = headers[0]!.byteLength;
+  const ip = headers[1];
+  const tcp = headers[2];
+  const ipStart = headers[0].byteLength;
   const frameEnd = ipStart + Number(ip.fields.find((f) => f.key === 'ipv4.total_length')?.value ?? 0);
 
   views.push({
@@ -263,9 +263,9 @@ function buildRequestStack(
     protocol: 'ethernet',
     label: 'Ethernet',
     bytes: carrierFrame.bytes.slice(0, frameEnd),
-    headerLength: headers[0]!.byteLength,
+    headerLength: headers[0].byteLength,
     trailerLength: 0,
-    header: headers[0]!,
+    header: headers[0],
     noteKey: 'layer.note.ethernet.request',
   });
 
@@ -326,7 +326,7 @@ function buildHops(ttlOut: number, ttlBack: number): Hop[] {
   for (let i = 0; i < count; i++) {
     hops.push({
       id: `hop-${i + 1}`,
-      nameKey: names[i]!,
+      nameKey: names[i],
       // Spacing is tight because the camera travels with the packet rather
       // than trying to hold the whole path in one frame.
       x: 14 + i * 11,
@@ -352,7 +352,7 @@ export async function buildJourney(): Promise<Journey> {
   if (cachedJourney) return cachedJourney;
 
   const session = loadSession();
-  const cipher = CIPHER_PARAMS[0x1302]!;
+  const cipher = CIPHER_PARAMS[0x1302];
   const clientRecords = await decryptStream(session.clientStream, session.keylog, 'client', cipher);
   const serverRecords = await decryptStream(session.serverStream, session.keylog, 'server', cipher);
 
@@ -375,7 +375,7 @@ export async function buildJourney(): Promise<Journey> {
         requestRecord.record.offset < f.streamOffset + f.payloadLength,
     ) ?? session.frames.find((f) => f.direction === 'up' && f.payloadLength > 0)!;
 
-  const dnsFrame = session.frames[0]!;
+  const dnsFrame = session.frames[0];
   const dnsStack = buildStack(dnsFrame, session, 'DNS question');
   const requestStack =
     requestRecord && requestRecord.decrypted
@@ -388,8 +388,8 @@ export async function buildJourney(): Promise<Journey> {
 
   const syn = session.frames.find((f) => f.protocol === 'tcp' && f.direction === 'up')!;
   const synAck = session.frames.find((f) => f.protocol === 'tcp' && f.direction === 'down')!;
-  const ttlOut = Number(syn.headers[1]!.fields.find((f) => f.key === 'ipv4.ttl')?.value ?? 64);
-  const ttlBack = Number(synAck.headers[1]!.fields.find((f) => f.key === 'ipv4.ttl')?.value ?? 64);
+  const ttlOut = Number(syn.headers[1].fields.find((f) => f.key === 'ipv4.ttl')?.value ?? 64);
+  const ttlBack = Number(synAck.headers[1].fields.find((f) => f.key === 'ipv4.ttl')?.value ?? 64);
 
   cachedJourney = {
     session,
@@ -403,7 +403,7 @@ export async function buildJourney(): Promise<Journey> {
     phyFrameLength: dnsFrame.bytes.length,
     hops: buildHops(ttlOut, ttlBack),
     handshakeRttNs: synAck.tNs - syn.tNs,
-    totalDurationNs: session.frames[session.frames.length - 1]!.tNs,
+    totalDurationNs: session.frames[session.frames.length - 1].tNs,
   };
   return cachedJourney;
 }
@@ -411,7 +411,7 @@ export async function buildJourney(): Promise<Journey> {
 /** The ClientHello, described, for the chapter that shows what it reveals. */
 export function clientHelloHeader(session: CapturedSession): Header | null {
   const records = parseRecords(session.clientStream);
-  if (!records.length || records[0]!.contentType !== 22) return null;
-  const [hello] = parseHandshake(records[0]!.payload, 0);
+  if (!records.length || records[0].contentType !== 22) return null;
+  const [hello] = parseHandshake(records[0].payload, 0);
   return hello ? describeHello(hello) : null;
 }

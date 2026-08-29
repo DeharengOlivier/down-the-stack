@@ -46,7 +46,7 @@ export class WorldView {
   private packet = new Group();
   private shell!: Mesh;
   private core!: Mesh;
-  private ttlLabel = createLabel('TTL 64', { color: LAYER_COLORS[3]!, size: 34 });
+  private ttlLabel = createLabel('TTL 64', { color: LAYER_COLORS[3], size: 34 });
   private mediumLabel = createLabel('', { color: '#e8eefc', size: 34 });
 
   constructor() {
@@ -79,7 +79,7 @@ export class WorldView {
       this.group.add(label);
 
       if (index < hops.length - 1) {
-        const next = hops[index + 1]!;
+        const next = hops[index + 1];
         const color = MEDIUM_COLORS[hop.medium];
         const points = [new Vector3(hop.x + 1.6, 0, 0), new Vector3(next.x - 1.6, 0, 0)];
         const line = new Line(
@@ -100,8 +100,8 @@ export class WorldView {
     this.core = new Mesh(
       new CapsuleGeometry(0.42, 1.35, 4, 12),
       new MeshStandardMaterial({
-        color: new Color(LAYER_COLORS[3]!),
-        emissive: new Color(LAYER_COLORS[3]!),
+        color: new Color(LAYER_COLORS[3]),
+        emissive: new Color(LAYER_COLORS[3]),
         emissiveIntensity: 2.2,
         roughness: 0.25,
       }),
@@ -146,8 +146,8 @@ export class WorldView {
    */
   update(progress: number, roundTrip = false): void {
     if (this.hops.length < 2) return;
-    const first = this.hops[0]!;
-    const last = this.hops[this.hops.length - 1]!;
+    const first = this.hops[0];
+    const last = this.hops[this.hops.length - 1];
     const travel = roundTrip ? 1 - Math.abs(1 - progress * 2) : progress;
     const x = first.x + (last.x - first.x) * travel;
     this.packet.position.set(x, 0, 0);
@@ -155,9 +155,9 @@ export class WorldView {
     // Which link the packet is currently on.
     let index = 0;
     for (let i = 0; i < this.hops.length - 1; i++) {
-      if (x >= this.hops[i]!.x) index = i;
+      if (x >= this.hops[i].x) index = i;
     }
-    const hop = this.hops[index]!;
+    const hop = this.hops[index];
     const color = new Color(MEDIUM_COLORS[hop.medium]);
     const shellMaterial = this.shell.material as MeshStandardMaterial;
     shellMaterial.color.copy(color);
@@ -169,7 +169,7 @@ export class WorldView {
     shellMaterial.opacity = 0.26 - rebuilding * 0.22;
     this.shell.scale.setScalar(1 + rebuilding * 0.5);
 
-    updateLabel(this.ttlLabel, `TTL ${hop.ttl}`, { color: LAYER_COLORS[3]!, size: 34 });
+    updateLabel(this.ttlLabel, `TTL ${hop.ttl}`, { color: LAYER_COLORS[3], size: 34 });
     updateLabel(this.mediumLabel, t(FRAME_KEYS[hop.medium]), {
       color: MEDIUM_COLORS[hop.medium],
       size: 34,
@@ -179,8 +179,8 @@ export class WorldView {
   /** Where the packet is right now, so the camera can travel with it. */
   packetX(progress: number, roundTrip = false): number {
     if (this.hops.length < 2) return 0;
-    const first = this.hops[0]!;
-    const last = this.hops[this.hops.length - 1]!;
+    const first = this.hops[0];
+    const last = this.hops[this.hops.length - 1];
     const travel = roundTrip ? 1 - Math.abs(1 - progress * 2) : progress;
     return first.x + (last.x - first.x) * travel;
   }
@@ -190,7 +190,7 @@ export class WorldView {
     if (this.hops.length < 2) return undefined;
     const x = this.packetX(progress, roundTrip);
     let index = 0;
-    for (let i = 0; i < this.hops.length - 1; i++) if (x >= this.hops[i]!.x) index = i;
+    for (let i = 0; i < this.hops.length - 1; i++) if (x >= this.hops[i].x) index = i;
     return this.hops[index];
   }
 
@@ -201,6 +201,6 @@ export class WorldView {
 
   get centreX(): number {
     if (!this.hops.length) return 0;
-    return (this.hops[0]!.x + this.hops[this.hops.length - 1]!.x) / 2;
+    return (this.hops[0].x + this.hops[this.hops.length - 1].x) / 2;
   }
 }

@@ -120,7 +120,7 @@ export function Inspector(props: InspectorProps) {
                               }}
                               onClick={() => props.onSelectByte(index())}
                             >
-                              {view().bytes[index()]!.toString(16).padStart(2, '0')}
+                              {view().bytes[index()].toString(16).padStart(2, '0')}
                             </button>
                           </Show>
                         );

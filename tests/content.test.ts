@@ -20,7 +20,7 @@ describe('the French and English dictionaries', () => {
   it('keep the same placeholders in both languages', () => {
     for (const key of Object.keys(en)) {
       const placeholders = (text: string) => (text.match(/\{[a-z]+\}/g) ?? []).sort();
-      expect(placeholders(fr[key]!), key).toEqual(placeholders(en[key]!));
+      expect(placeholders(fr[key]), key).toEqual(placeholders(en[key]));
     }
   });
 

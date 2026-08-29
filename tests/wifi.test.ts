@@ -62,11 +62,11 @@ describe('the frame the standard describes', () => {
 
   it('declares itself a QoS data frame going up through the access point', () => {
     const bytes = frame();
-    expect((bytes[0]! >> 2) & 0x03).toBe(FRAME_TYPE.DATA);
-    expect((bytes[0]! >> 4) & 0x0f).toBe(SUBTYPE_QOS_DATA);
-    expect(bytes[0]! & 0x03).toBe(0); // protocol version 0, the only one there is
-    expect(bytes[1]! & 0x01).toBe(1); // to the distribution system
-    expect((bytes[1]! >> 1) & 0x01).toBe(0); // and not from it
+    expect((bytes[0] >> 2) & 0x03).toBe(FRAME_TYPE.DATA);
+    expect((bytes[0] >> 4) & 0x0f).toBe(SUBTYPE_QOS_DATA);
+    expect(bytes[0] & 0x03).toBe(0); // protocol version 0, the only one there is
+    expect(bytes[1] & 0x01).toBe(1); // to the distribution system
+    expect((bytes[1] >> 1) & 0x01).toBe(0); // and not from it
   });
 
   it('puts the three addresses in the order 802.11 gives them', () => {
@@ -102,12 +102,12 @@ describe('the frame the standard describes', () => {
     // exist at all.
     const bytes = frame();
     expect(Array.from(bytes.subarray(26, 32))).toEqual([0xaa, 0xaa, 0x03, 0x00, 0x00, 0x00]);
-    expect((bytes[32]! << 8) | bytes[33]!).toBe(ETHERTYPE.IPV4);
+    expect((bytes[32] << 8) | bytes[33]).toBe(ETHERTYPE.IPV4);
   });
 
   it('carries the traffic class it was given', () => {
-    expect(frame({ priority: 6 })[24]! & 0x07).toBe(6);
-    expect(frame()[24]! & 0x07).toBe(0);
+    expect(frame({ priority: 6 })[24] & 0x07).toBe(6);
+    expect(frame()[24] & 0x07).toBe(0);
   });
 });
 
@@ -135,10 +135,10 @@ describe('encapsulation', () => {
     const bytes = frame({}, new Uint8Array(0));
     expect(bytes.length).toBe(WIFI_HEADER_BYTES + LLC_SNAP_BYTES + FCS_BYTES);
     expect(crc32(bytes.subarray(0, bytes.length - FCS_BYTES)) >>> 0).toBe(
-      (bytes[bytes.length - 1]! << 24 >>> 0) +
-        (bytes[bytes.length - 2]! << 16) +
-        (bytes[bytes.length - 3]! << 8) +
-        bytes[bytes.length - 4]!,
+      (bytes[bytes.length - 1] << 24 >>> 0) +
+        (bytes[bytes.length - 2] << 16) +
+        (bytes[bytes.length - 3] << 8) +
+        bytes[bytes.length - 4],
     );
   });
 });
@@ -152,7 +152,7 @@ describe('what this reconstruction does not claim', () => {
     // interface says so: this pins it so a later change cannot start claiming
     // protection that is not there.
     const bytes = frame();
-    expect((bytes[1]! >> 6) & 0x01).toBe(0);
+    expect((bytes[1] >> 6) & 0x01).toBe(0);
     const header = describeWifi(bytes);
     const control = header.fields.find((f) => f.key === 'wifi.fc')!;
     const protectedBit = control.children!.find((f) => f.key === 'wifi.fc.protected')!;

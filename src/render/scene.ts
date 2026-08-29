@@ -123,8 +123,8 @@ export function createScene(canvas: HTMLCanvasElement, journey: Journey): SceneH
       target: new Vector3(worldView.centreX, 0, 0),
     },
     server: {
-      position: new Vector3(journey.hops[journey.hops.length - 1]!.x - 6, 8, 38),
-      target: new Vector3(journey.hops[journey.hops.length - 1]!.x - 6, 0, 0),
+      position: new Vector3(journey.hops[journey.hops.length - 1].x - 6, 8, 38),
+      target: new Vector3(journey.hops[journey.hops.length - 1].x - 6, 0, 0),
     },
   };
 
@@ -185,7 +185,7 @@ export function createScene(canvas: HTMLCanvasElement, journey: Journey): SceneH
       if (view) {
         const stack = wanted === 'request' ? journey.requestStack : journey.dnsStack;
         const index = stackView.focusedIndex(revealProgress);
-        const inner = index > 0 ? stack[index - 1]!.protocol : view.protocol;
+        const inner = index > 0 ? stack[index - 1].protocol : view.protocol;
         byteGrid.set(view.bytes, view.headerLength, view.protocol, inner);
       }
     }

@@ -1,4 +1,4 @@
-import { Show, createEffect, createMemo, createSignal, onCleanup, onMount } from 'solid-js';
+import { Show, createEffect, createMemo, createSignal, onCleanup, onMount, For } from 'solid-js';
 import { buildJourney, type Journey, type LayerView } from '../core/scenario/journey';
 import { buildTimeline, stateAt, type Timeline, type TimelineState } from '../timeline/timeline';
 import { createScene, type SceneHandle } from '../render/scene';
@@ -172,7 +172,7 @@ export function App() {
                   {t('ui.groundTruth')}
                 </span>
                 <div class="langs">
-                  {(['en', 'fr'] as Locale[]).map((code) => (
+                  <For each={['en', 'fr'] as Locale[]}>{(code) => (
                     <button
                       type="button"
                       class="langs__item"
@@ -181,7 +181,7 @@ export function App() {
                     >
                       {code.toUpperCase()}
                     </button>
-                  ))}
+                  )}</For>
                 </div>
               </div>
             </header>
@@ -205,11 +205,11 @@ export function App() {
                   <h2>{t(stageAt(current().progress).key)}</h2>
                   <p>{t(`${stageAt(current().progress).key}.body`)}</p>
                   <ol class="phy-stage__steps">
-                    {PHY_STAGES.map((stage) => (
+                    <For each={PHY_STAGES}>{(stage) => (
                       <li classList={{ 'is-active': stageAt(current().progress).key === stage.key }}>
                         {t(stage.key)}
                       </li>
-                    ))}
+                    )}</For>
                   </ol>
                 </div>
               </Show>

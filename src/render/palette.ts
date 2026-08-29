@@ -16,15 +16,15 @@ export const LAYER_COLORS: Record<number, string> = {
 };
 
 export const PROTOCOL_COLORS: Record<string, string> = {
-  http: LAYER_COLORS[7]!,
-  dns: LAYER_COLORS[7]!,
-  tls: LAYER_COLORS[5]!,
-  tcp: LAYER_COLORS[4]!,
-  udp: LAYER_COLORS[4]!,
-  ipv4: LAYER_COLORS[3]!,
-  ethernet: LAYER_COLORS[2]!,
+  http: LAYER_COLORS[7],
+  dns: LAYER_COLORS[7],
+  tls: LAYER_COLORS[5],
+  tcp: LAYER_COLORS[4],
+  udp: LAYER_COLORS[4],
+  ipv4: LAYER_COLORS[3],
+  ethernet: LAYER_COLORS[2],
   wifi: '#f472b6',
-  phy: LAYER_COLORS[1]!,
+  phy: LAYER_COLORS[1],
 };
 
 export const BACKGROUND = '#05070e';

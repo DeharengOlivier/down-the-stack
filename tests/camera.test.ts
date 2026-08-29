@@ -51,7 +51,7 @@ describe('the vertical field of view', () => {
     const narrowing = [1.7, 1.4, 1.1, 0.9, 0.7];
     const fovs = narrowing.map(verticalFovFor);
     for (let i = 1; i < fovs.length; i += 1) {
-      expect(fovs[i]!, `aspect ${narrowing[i]}`).toBeGreaterThan(fovs[i - 1]!);
+      expect(fovs[i], `aspect ${narrowing[i]}`).toBeGreaterThan(fovs[i - 1]);
     }
   });
 

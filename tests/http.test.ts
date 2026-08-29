@@ -24,7 +24,7 @@ async function capturedRequest(): Promise<Uint8Array> {
     session.clientStream,
     session.keylog,
     'client',
-    CIPHER_PARAMS[0x1302]!,
+    CIPHER_PARAMS[0x1302],
   );
   const payloads = records
     .filter((r) => r.phase === 'application' && r.innerType === 23)
@@ -130,7 +130,7 @@ describe('reading a request back', () => {
 
   it('recognises a response and calls its first line a status line', () => {
     const header = describeHttp(new TextEncoder().encode('HTTP/1.1 200 OK\r\nServer: x\r\n\r\n'));
-    expect(header.fields[0]!.key).toBe('http.status_line');
+    expect(header.fields[0].key).toBe('http.status_line');
     expect(header.summary).toBe('HTTP/1.1 200 OK');
   });
 

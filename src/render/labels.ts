@@ -54,10 +54,10 @@ export function createLabel(text: string, options: LabelOptions = {}): Sprite {
 /** Replaces a label's text in place, reusing the sprite. */
 export function updateLabel(sprite: Sprite, text: string, options: LabelOptions = {}): void {
   const next = createLabel(text, options);
-  const material = sprite.material as SpriteMaterial;
+  const material = sprite.material;
   material.map?.dispose();
-  material.map = (next.material as SpriteMaterial).map;
+  material.map = (next.material).map;
   material.needsUpdate = true;
   sprite.scale.copy(next.scale);
-  (next.material as SpriteMaterial).dispose();
+  (next.material).dispose();
 }

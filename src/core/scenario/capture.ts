@@ -61,7 +61,7 @@ export function loadSession(): CapturedSession {
   if (cached) return cached;
 
   const clientIpFromFirst = (() => {
-    const first = fromHex(groundTruth.frames[0]!.hex);
+    const first = fromHex(groundTruth.frames[0].hex);
     return formatIpv4(first, 14 + 12);
   })();
 
@@ -134,7 +134,7 @@ export function loadSession(): CapturedSession {
     });
   }
 
-  const first = fromHex(groundTruth.frames[0]!.hex);
+  const first = fromHex(groundTruth.frames[0].hex);
   cached = {
     host: groundTruth.host,
     serverIp: groundTruth.serverIp,
@@ -152,6 +152,6 @@ export function loadSession(): CapturedSession {
 /** Sequence number of a TCP frame, for showing how the stream is ordered. */
 export function tcpSeq(frame: CapturedFrame): number | null {
   if (frame.protocol !== 'tcp') return null;
-  const ipHeader = frame.headers[1]!;
+  const ipHeader = frame.headers[1];
   return readU32(frame.bytes, 14 + ipHeader.byteLength + 4);
 }

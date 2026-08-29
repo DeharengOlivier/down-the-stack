@@ -66,8 +66,8 @@ export interface TimelineState {
 /** Nanoseconds between two frames of the capture, by index. */
 function span(journey: Journey, from: number, to: number): number {
   const frames = journey.session.frames;
-  const a = frames[Math.min(from, frames.length - 1)]!;
-  const b = frames[Math.min(to, frames.length - 1)]!;
+  const a = frames[Math.min(from, frames.length - 1)];
+  const b = frames[Math.min(to, frames.length - 1)];
   return Math.max(0, b.tNs - a.tNs);
 }
 
@@ -109,7 +109,7 @@ export function stateAt(timeline: Timeline, t: number): TimelineState {
   const clamped = Math.max(0, Math.min(t, timeline.totalDuration));
   let acc = 0;
   for (let i = 0; i < timeline.chapters.length; i++) {
-    const chapter = timeline.chapters[i]!;
+    const chapter = timeline.chapters[i];
     if (clamped < acc + chapter.duration || i === timeline.chapters.length - 1) {
       const progress = chapter.duration > 0 ? Math.min(1, (clamped - acc) / chapter.duration) : 1;
       const slowdown = chapter.realSpanNs > 0 ? (chapter.duration * 1e9) / chapter.realSpanNs : 0;
@@ -124,14 +124,14 @@ export function stateAt(timeline: Timeline, t: number): TimelineState {
     }
     acc += chapter.duration;
   }
-  const last = timeline.chapters[timeline.chapters.length - 1]!;
+  const last = timeline.chapters[timeline.chapters.length - 1];
   return { t: clamped, chapterIndex: timeline.chapters.length - 1, chapter: last, progress: 1, realNs: last.realStartNs + last.realSpanNs, slowdown: 0 };
 }
 
 /** Screen time at which a chapter starts, for the scrubber's markers. */
 export function chapterStart(timeline: Timeline, index: number): number {
   let acc = 0;
-  for (let i = 0; i < index && i < timeline.chapters.length; i++) acc += timeline.chapters[i]!.duration;
+  for (let i = 0; i < index && i < timeline.chapters.length; i++) acc += timeline.chapters[i].duration;
   return acc;
 }
 

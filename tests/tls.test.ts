@@ -16,17 +16,17 @@ describe('the captured TLS session', () => {
   it('starts with a ClientHello naming the site it wants', () => {
     const session = loadSession();
     const records = parseRecords(session.clientStream);
-    expect(records[0]!.contentType).toBe(22);
-    const [hello] = parseHandshake(records[0]!.payload, 0);
-    expect(hello!.type).toBe(1);
-    const described = describeHello(hello!);
+    expect(records[0].contentType).toBe(22);
+    const [hello] = parseHandshake(records[0].payload, 0);
+    expect(hello.type).toBe(1);
+    const described = describeHello(hello);
     const sni = described.fields.find((f) => f.key === 'tls.ext.server_name');
     expect(sni?.display).toBe('example.com');
   });
 
   it('reveals the HTTP request hidden inside the encrypted records', async () => {
     const session = loadSession();
-    const records = await decryptStream(session.clientStream, session.keylog, 'client', CIPHER_PARAMS[0x1302]!);
+    const records = await decryptStream(session.clientStream, session.keylog, 'client', CIPHER_PARAMS[0x1302]);
 
     const application = records.filter((r) => r.phase === 'application' && r.innerType === 23);
     expect(application.length).toBeGreaterThan(0);
@@ -38,7 +38,7 @@ describe('the captured TLS session', () => {
 
   it('reveals the server response, headers and body', async () => {
     const session = loadSession();
-    const records = await decryptStream(session.serverStream, session.keylog, 'server', CIPHER_PARAMS[0x1302]!);
+    const records = await decryptStream(session.serverStream, session.keylog, 'server', CIPHER_PARAMS[0x1302]);
 
     const application = records.filter((r) => r.phase === 'application' && r.innerType === 23);
     const text = application.map((r) => decoder.decode(r.decrypted!)).join('');
@@ -52,7 +52,7 @@ describe('the captured TLS session', () => {
 
   it('decrypts the server certificate out of the handshake', async () => {
     const session = loadSession();
-    const records = await decryptStream(session.serverStream, session.keylog, 'server', CIPHER_PARAMS[0x1302]!);
+    const records = await decryptStream(session.serverStream, session.keylog, 'server', CIPHER_PARAMS[0x1302]);
 
     // Inner content type 22 means the record held handshake messages that were
     // themselves encrypted, which is new in TLS 1.3: the certificate no longer

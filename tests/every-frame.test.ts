@@ -33,10 +33,10 @@ function hexOf(bytes: Uint8Array): string {
   return out;
 }
 
-const u8 = (b: Uint8Array, o: number) => b[o]!;
-const u16 = (b: Uint8Array, o: number) => (b[o]! << 8) | b[o + 1]!;
+const u8 = (b: Uint8Array, o: number) => b[o];
+const u16 = (b: Uint8Array, o: number) => (b[o] << 8) | b[o + 1];
 const u32 = (b: Uint8Array, o: number) =>
-  ((b[o]! << 24) >>> 0) + (b[o + 1]! << 16) + (b[o + 2]! << 8) + b[o + 3]!;
+  ((b[o] << 24) >>> 0) + (b[o + 1] << 16) + (b[o + 2] << 8) + b[o + 3];
 
 const macAt = (b: Uint8Array, o: number) =>
   Array.from(b.subarray(o, o + 6), (x) => x.toString(16).padStart(2, '0')).join(':');

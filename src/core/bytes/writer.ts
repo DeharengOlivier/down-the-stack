@@ -58,7 +58,7 @@ export class ByteWriter {
 
   raw(src: ArrayLike<number>): this {
     this.ensure(src.length);
-    this.buf.set(src as Uint8Array, this.len);
+    this.buf.set(src, this.len);
     this.len += src.length;
     return this;
   }

@@ -47,7 +47,7 @@ export const PHY_STAGES: PhyStage[] = [
 ];
 
 export function stageAt(progress: number): PhyStage {
-  return PHY_STAGES.find((s) => progress < s.to) ?? PHY_STAGES[PHY_STAGES.length - 1]!;
+  return PHY_STAGES.find((s) => progress < s.to) ?? PHY_STAGES[PHY_STAGES.length - 1];
 }
 
 export class PhyView {

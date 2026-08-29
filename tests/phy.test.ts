@@ -79,9 +79,9 @@ describe('structure taken from the standard', () => {
     );
     for (const k of PILOT_INDICES) {
       const bin = (k + FFT_SIZE) % FFT_SIZE;
-      expect(Math.abs(spectrum[bin]!.re)).toBe(1);
+      expect(Math.abs(spectrum[bin].re)).toBe(1);
     }
-    expect(spectrum[0]!.re).toBe(0); // DC stays empty
+    expect(spectrum[0].re).toBe(0); // DC stays empty
   });
 });
 
@@ -114,8 +114,8 @@ describe('each stage is reversible on its own', () => {
     const spectrum = buildSpectrum(mapQam64(randomBits(288)), 0);
     const back = forwardFft(inverseFft(spectrum));
     spectrum.forEach((c, i) => {
-      expect(back[i]!.re).toBeCloseTo(c.re, 10);
-      expect(back[i]!.im).toBeCloseTo(c.im, 10);
+      expect(back[i].re).toBeCloseTo(c.re, 10);
+      expect(back[i].im).toBeCloseTo(c.im, 10);
     });
   });
 
@@ -151,7 +151,7 @@ describe('the whole chain, on a real frame', () => {
   it('turns a captured frame into a waveform and reads it back unchanged', () => {
     const session = loadSession();
     // The DNS query: small enough to keep the test quick, real enough to matter.
-    const frame = session.frames[0]!.bytes;
+    const frame = session.frames[0].bytes;
     const result = modulate(frame);
 
     expect(result.symbols.length).toBeGreaterThan(0);
@@ -159,7 +159,7 @@ describe('the whole chain, on a real frame', () => {
       expect(symbol.samples.length).toBe(SYMBOL_SAMPLES);
       // The cyclic prefix really is a copy of the symbol's own tail.
       for (let i = 0; i < GUARD_SAMPLES; i++) {
-        expect(symbol.samples[i]!.re).toBeCloseTo(symbol.samples[i + FFT_SIZE]!.re, 10);
+        expect(symbol.samples[i].re).toBeCloseTo(symbol.samples[i + FFT_SIZE].re, 10);
       }
     }
 
@@ -168,7 +168,7 @@ describe('the whole chain, on a real frame', () => {
 
   it('spends the air time the standard predicts', () => {
     const session = loadSession();
-    const frame = session.frames[0]!.bytes;
+    const frame = session.frames[0].bytes;
     const result = modulate(frame);
     const expectedSymbols = Math.ceil(((frame.length * 8 + 6) * 4) / 3 / CODED_BITS_PER_SYMBOL);
     expect(result.symbols.length).toBe(expectedSymbols);
