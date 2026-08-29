@@ -34,13 +34,18 @@ segments, the encrypted request, the response, and the teardown.
 That capture ships with the project, in `fixtures/`. The two real MAC addresses
 were replaced with locally administered stand-ins, because a MAC address
 identifies physical hardware. Nothing else in it is personal: the client address
-is private and behind NAT.
+is private and behind NAT. That is not left as a promise either:
+`tests/published-capture.test.ts` checks the published files on every run, and
+[SECURITY.md](SECURITY.md) says exactly what they expose.
 
 **Two independent checks keep it honest.**
 
 1. The encoders in `src/core/protocols/` are given hand-transcribed field values
    and must reproduce the captured frames byte for byte, options, padding, DNS
-   compression pointers and checksums included. See `tests/byte-exact.test.ts`.
+   compression pointers and checksums included. Not a sample of them: all
+   twenty-two, rebuilt from an offset reader written independently of the
+   encoders, so a shared misreading cannot make both sides agree. See
+   `tests/byte-exact.test.ts` and `tests/every-frame.test.ts`.
 2. The physical layer, which has no capture to compare against, must survive a
    round trip: the receive chain has to return exactly what the transmit chain
    was handed, including after bits are deliberately flipped. Its structure is
@@ -110,9 +115,14 @@ draw the wrong conclusions about what is fast.
 ```sh
 npm install
 npm run dev        # http://localhost:5180
-npm test           # the byte-exactness and round-trip suites
+npm test           # 224 tests: byte-exactness, round trips, timeline, fixtures
 npm run typecheck
+npm run lint
+npm run build
 ```
+
+The interface is built for a 375px screen first and gains its side-by-side
+layout at 700px. Everything on it is reachable by touch.
 
 To record your own capture instead of using the bundled one, on a machine where
 packet capture is permitted without elevation (installing Wireshark's ChmodBPF
