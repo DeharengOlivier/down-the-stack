@@ -81,6 +81,9 @@ export function Scrubber(props: ScrubberProps) {
         </div>
       </div>
 
+      {/* Shown where there is a keyboard to use it with. */}
+      <p class="shortcuts">{t('ui.shortcuts')}</p>
+
       <dl class="readout">
         <div>
           <dt>{t('ui.realTime')}</dt>

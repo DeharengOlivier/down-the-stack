@@ -1,9 +1,10 @@
 import { Show, createEffect, createMemo, createSignal, onCleanup, onMount, For } from 'solid-js';
 import { buildJourney, type Journey, type LayerView } from '../core/scenario/journey';
-import { buildTimeline, stateAt, type Timeline, type TimelineState } from '../timeline/timeline';
+import { buildTimeline, chapterStart, stateAt, type Timeline, type TimelineState } from '../timeline/timeline';
 import { createScene, type SceneHandle } from '../render/scene';
 import { Inspector, highlightedBytes } from './Inspector';
 import { Scrubber } from './Scrubber';
+import { autoplayOnLoad, shortcutFor } from './shortcuts';
 import { PHY_STAGES, stageAt } from '../render/phy-view';
 import { locale, setLocale, t, type Locale } from '../content';
 import { colorFor } from '../render/palette';
@@ -51,7 +52,11 @@ export function App() {
   const [journey, setJourney] = createSignal<Journey | null>(null);
   const [timeline, setTimeline] = createSignal<Timeline | null>(null);
   const [time, setTime] = createSignal(0);
-  const [playing, setPlaying] = createSignal(true);
+  // A viewer who asked their system for less motion gets the same page,
+  // paused, rather than a journey that starts moving at them.
+  const [playing, setPlaying] = createSignal(
+    autoplayOnLoad(typeof window === 'undefined' ? undefined : window.matchMedia.bind(window)),
+  );
   const [speed, setSpeed] = createSignal(1);
   const [selectedByte, setSelectedByte] = createSignal<number | null>(null);
   const [failure, setFailure] = createSignal<string | null>(null);
@@ -81,8 +86,56 @@ export function App() {
     const onResize = () => handle?.resize();
     window.addEventListener('resize', onResize);
     onCleanup(() => window.removeEventListener('resize', onResize));
+
+    window.addEventListener('keydown', onKeyDown);
+    onCleanup(() => window.removeEventListener('keydown', onKeyDown));
     void start();
   });
+
+  /** Moves to the start of the chapter `delta` steps from the current one. */
+  function stepChapter(delta: number): void {
+    const line = timeline();
+    const current = state();
+    if (!line || !current) return;
+    const index = Math.max(0, Math.min(line.chapters.length - 1, current.chapterIndex + delta));
+    setTime(chapterStart(line, index) + 0.01);
+  }
+
+  function onKeyDown(event: KeyboardEvent): void {
+    const target = event.target;
+    const shortcut = shortcutFor({
+      key: event.key,
+      shiftKey: event.shiftKey,
+      ctrlKey: event.ctrlKey,
+      metaKey: event.metaKey,
+      altKey: event.altKey,
+      insideTextField:
+        target instanceof HTMLInputElement && target.type !== 'range'
+          ? true
+          : target instanceof HTMLTextAreaElement,
+    });
+    if (!shortcut) return;
+    const line = timeline();
+    if (!line) return;
+
+    // Space scrolls the page and the arrows move a focused range input, so a
+    // press we act on is a press the browser must not also act on.
+    event.preventDefault();
+    switch (shortcut.kind) {
+      case 'toggle':
+        setPlaying((value) => !value);
+        break;
+      case 'seek':
+        setTime((value) => Math.max(0, Math.min(line.totalDuration, value + shortcut.seconds)));
+        break;
+      case 'chapter':
+        stepChapter(shortcut.delta);
+        break;
+      case 'restart':
+        setTime(0);
+        break;
+    }
+  }
 
   async function start(): Promise<void> {
     try {

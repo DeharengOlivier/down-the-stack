@@ -57,6 +57,7 @@ export const en: Record<string, string> = {
   'ui.timeScale': 'Time scale',
   'ui.layer': 'Layer',
   'ui.chapter': 'Chapter',
+  'ui.shortcuts': 'Space plays. Arrows move a second, with shift a whole chapter.',
   'ui.inspector': 'Inspector',
   'ui.inspector.empty': 'Click any byte in the scene, or any field in the list, to see what it is and why it exists.',
   'ui.bytes': 'bytes',

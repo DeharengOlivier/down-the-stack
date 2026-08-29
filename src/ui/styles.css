@@ -705,6 +705,15 @@ canvas {
   font-size: 12px !important;
 }
 
+/* The keyboard hint. Hidden on a phone, where there is no keyboard to press
+   and no room to spare, and shown from the tablet breakpoint upwards. */
+.shortcuts {
+  display: none;
+  margin: 0;
+  font-size: 11px;
+  color: var(--dim);
+}
+
 /* --- tablet ---------------------------------------------------------------- */
 /* Enough width for the panels to sit beside the scene instead of under it, but
    not enough for both of them at once. The chapter card takes the left, the
@@ -726,6 +735,10 @@ canvas {
   .scrubber {
     grid-template-columns: auto 1fr;
     gap: 16px;
+  }
+
+  .shortcuts {
+    display: block;
   }
 }
 

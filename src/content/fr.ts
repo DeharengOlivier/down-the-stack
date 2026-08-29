@@ -57,6 +57,8 @@ export const fr: Record<string, string> = {
   'ui.timeScale': 'Échelle de temps',
   'ui.layer': 'Couche',
   'ui.chapter': 'Chapitre',
+  'ui.shortcuts':
+    'Espace lance la lecture. Les flèches avancent d\'une seconde, avec majuscule d\'un chapitre.',
   'ui.inspector': 'Inspecteur',
   'ui.inspector.empty': "Clique un octet dans la scène, ou un champ dans la liste, pour voir ce que c'est et pourquoi il existe.",
   'ui.bytes': 'octets',
