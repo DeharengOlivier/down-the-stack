@@ -7,3 +7,4 @@ dist/
 # addresses. Only the filtered, anonymised fixture is published.
 fixtures/session.pcap
 fixtures/session.meta.json
+coverage/

@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A second push to the same branch cancels the run it supersedes.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Lint, types, tests and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Lint
+        # --max-warnings 0, because a warning nobody has to act on is a warning
+        # nobody reads.
+        run: npx eslint --max-warnings 0
+      - name: Types
+        run: npx tsc --noEmit
+      - name: Tests
+        # Byte-exactness against the captured session, the physical layer round
+        # trip, and the anonymisation of the published fixture.
+        run: npm test
+      - name: Build
+        run: npm run build
+
+  audit:
+    name: Dependency advisories
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Advisories
+        # The site is static, holds no credential and talks to no server of its
+        # own, so a low-severity advisory in a build tool is not worth blocking
+        # a merge. High and critical are.
+        run: npm audit --audit-level=high
