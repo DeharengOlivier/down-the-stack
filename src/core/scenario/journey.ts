@@ -66,6 +66,9 @@ export interface Journey {
 
 const decoder = new TextDecoder();
 
+/** Content type, legacy version, length. The rest of the record is protected. */
+const TLS_RECORD_HEADER_BYTES = 5;
+
 function concat(parts: Uint8Array[]): Uint8Array {
   const total = parts.reduce((n, p) => n + p.length, 0);
   const out = new Uint8Array(total);
@@ -205,13 +208,23 @@ function buildRequestStack(
     ]),
     record.record.payload,
   ]);
+  // Everything the record adds after the plaintext, measured rather than
+  // assumed: the sixteen byte AEAD tag, and the one byte TLS 1.3 appends to
+  // the plaintext before encrypting it to carry the true record type.
+  //
+  // That byte is the whole trick of TLS 1.3 record framing: every record calls
+  // itself "application data" on the wire, and the real type is hidden inside
+  // the encryption. Declaring a flat 16 left it counted as payload, and
+  // stack-view.ts draws the payload as total minus header minus trailer, so it
+  // was coloured as part of the HTTP request.
+  const tlsTrailerLength = recordBytes.length - TLS_RECORD_HEADER_BYTES - plaintext.length;
   views.push({
     layer: 5,
     protocol: 'tls',
     label: 'TLS 1.3 record',
     bytes: recordBytes,
-    headerLength: 5,
-    trailerLength: 16,
+    headerLength: TLS_RECORD_HEADER_BYTES,
+    trailerLength: tlsTrailerLength,
     header: describeRecord(record.record),
     noteKey: 'layer.note.tls',
     noteValues: { n: recordBytes.length },
