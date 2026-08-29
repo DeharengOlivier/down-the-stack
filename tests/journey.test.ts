@@ -48,7 +48,7 @@ describe.each(stacks)('%s, layer by layer', (_name, stack) => {
     const layers = stack.map((view) => view.layer);
     expect(layers.length).toBeGreaterThan(2);
     for (let i = 1; i < layers.length; i += 1) {
-      expect(layers[i]!, `layer ${i}`).toBeLessThanOrEqual(layers[i - 1]!);
+      expect(layers[i], `layer ${i}`).toBeLessThanOrEqual(layers[i - 1]);
     }
   });
 
@@ -60,8 +60,8 @@ describe.each(stacks)('%s, layer by layer', (_name, stack) => {
     // exists to show rather than for convenience. Each is pinned separately
     // below, so neither can quietly grow into a third.
     for (let i = 1; i < stack.length; i += 1) {
-      const outer = stack[i]!;
-      const inner = stack[i - 1]!;
+      const outer = stack[i];
+      const inner = stack[i - 1];
       if (outer.protocol === 'tls' || outer.protocol === 'wifi') continue;
       expect(
         indexOf(carried(outer), inner.bytes),
@@ -72,8 +72,8 @@ describe.each(stacks)('%s, layer by layer', (_name, stack) => {
 
   it('grows on the way down and never shrinks', () => {
     for (let i = 1; i < stack.length; i += 1) {
-      expect(stack[i]!.bytes.length, stack[i]!.protocol).toBeGreaterThan(
-        stack[i - 1]!.bytes.length,
+      expect(stack[i].bytes.length, stack[i].protocol).toBeGreaterThan(
+        stack[i - 1].bytes.length,
       );
     }
   });
@@ -133,7 +133,7 @@ describe('the journey reflects the capture rather than a script', () => {
 
   it('ends when the capture ends', () => {
     const frames = journey.session.frames;
-    expect(journey.totalDurationNs).toBe(frames[frames.length - 1]!.tNs);
+    expect(journey.totalDurationNs).toBe(frames[frames.length - 1].tNs);
   });
 
   it('modulates a frame whose length it reports', () => {
@@ -141,10 +141,10 @@ describe('the journey reflects the capture rather than a script', () => {
     expect(journey.phy.durationNs).toBeGreaterThan(0);
   });
 
-  it('is built once and handed out again, not rebuilt per caller', () => {
+  it('is built once and handed out again, not rebuilt per caller', async () => {
     // The renderer and the interface both ask for it. Rebuilding would redo
     // the decryption and the OFDM chain on every consumer.
-    expect(buildJourney()).resolves.toBe(journey);
+    await expect(buildJourney()).resolves.toBe(journey);
   });
 });
 
@@ -152,8 +152,8 @@ describe('the journey reflects the capture rather than a script', () => {
 
 describe('the hops', () => {
   it('starts at the laptop and ends at the server', () => {
-    expect(journey.hops[0]!.id).toBe('laptop');
-    expect(journey.hops[journey.hops.length - 1]!.id).toBe('server');
+    expect(journey.hops[0].id).toBe('laptop');
+    expect(journey.hops[journey.hops.length - 1].id).toBe('server');
   });
 
   it('spends exactly one TTL at every router along the way', () => {
@@ -161,10 +161,10 @@ describe('the hops', () => {
     // the TTL the last router left, and decrements nothing.
     const routers = journey.hops.slice(0, -1);
     for (let i = 1; i < routers.length; i += 1) {
-      expect(routers[i]!.ttl, `hop ${i}`).toBe(routers[i - 1]!.ttl - 1);
+      expect(routers[i].ttl, `hop ${i}`).toBe(routers[i - 1].ttl - 1);
     }
-    const server = journey.hops[journey.hops.length - 1]!;
-    expect(server.ttl).toBe(routers[routers.length - 1]!.ttl);
+    const server = journey.hops[journey.hops.length - 1];
+    expect(server.ttl).toBe(routers[routers.length - 1].ttl);
   });
 
   it('never lets the TTL reach zero, since the packet did arrive', () => {
@@ -173,12 +173,12 @@ describe('the hops', () => {
 
   it('lays the path out left to right so the camera can travel along it', () => {
     for (let i = 1; i < journey.hops.length; i += 1) {
-      expect(journey.hops[i]!.x).toBeGreaterThan(journey.hops[i - 1]!.x);
+      expect(journey.hops[i].x).toBeGreaterThan(journey.hops[i - 1].x);
     }
   });
 
   it('crosses the media the story needs, starting on Wi-Fi', () => {
-    expect(journey.hops[0]!.medium).toBe('wifi');
+    expect(journey.hops[0].medium).toBe('wifi');
     expect(new Set(journey.hops.map((h) => h.medium)).size).toBeGreaterThan(1);
   });
 });

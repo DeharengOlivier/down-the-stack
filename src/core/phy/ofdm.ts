@@ -266,8 +266,8 @@ export function mapQam64(bits: Uint8Array): Complex[] {
     const iBits = `${bits[i]}${bits[i + 1]}${bits[i + 2]}`;
     const qBits = `${bits[i + 3]}${bits[i + 4]}${bits[i + 5]}`;
     out.push({
-      re: GRAY_64[iBits]! * QAM64_NORMALISATION,
-      im: GRAY_64[qBits]! * QAM64_NORMALISATION,
+      re: GRAY_64[iBits] * QAM64_NORMALISATION,
+      im: GRAY_64[qBits] * QAM64_NORMALISATION,
     });
   }
   return out;
@@ -324,7 +324,7 @@ function fft(input: Complex[], inverse: boolean): Complex[] {
   if (n === 1) return [{ ...input[0] }];
   const even = fft(input.filter((_, i) => i % 2 === 0), inverse);
   const odd = fft(input.filter((_, i) => i % 2 === 1), inverse);
-  const out: Complex[] = new Array(n);
+  const out: Complex[] = new Array<Complex>(n);
   const sign = inverse ? 2 : -2;
   for (let k = 0; k < n / 2; k++) {
     const angle = (sign * Math.PI * k) / n;

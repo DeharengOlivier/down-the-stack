@@ -27,7 +27,11 @@ export function Scrubber(props: ScrubberProps) {
   return (
     <div class="scrubber">
       <div class="scrubber__controls">
-        <button type="button" class="button button--primary" onClick={props.onTogglePlay}>
+        <button
+          type="button"
+          class="button button--primary"
+          onClick={() => props.onTogglePlay()}
+        >
           {props.playing ? t('ui.pause') : t('ui.play')}
         </button>
         <button type="button" class="button" onClick={() => props.onSeek(0)}>

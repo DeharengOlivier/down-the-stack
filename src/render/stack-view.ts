@@ -7,6 +7,7 @@ import {
   MeshStandardMaterial,
   Object3D,
 } from 'three';
+import type { BufferGeometry } from 'three';
 import type { LayerView } from '../core/scenario/journey';
 import { colorFor } from './palette';
 import { createLabel, updateLabel } from './labels';
@@ -27,8 +28,11 @@ const STRIP_HEIGHT = 1.4;
 const STRIP_DEPTH = 1.1;
 const STRIP_GAP = 3;
 
+/** Every segment mesh is built here, and always with a standard material. */
+export type SegmentMesh = Mesh<BufferGeometry, MeshStandardMaterial>;
+
 export interface StripSegment {
-  mesh: Mesh;
+  mesh: SegmentMesh;
   kind: 'header' | 'payload' | 'trailer';
 }
 
@@ -133,8 +137,7 @@ export class StackView {
       strip.group.scale.set(eased, eased, eased);
       strip.group.position.z = (1 - eased) * -8;
       for (const segment of strip.segments) {
-        const material = segment.mesh.material as MeshStandardMaterial;
-        material.opacity = (segment.kind === 'payload' ? 0.75 : 1) * eased;
+        segment.mesh.material.opacity = (segment.kind === 'payload' ? 0.75 : 1) * eased;
       }
     });
   }
@@ -153,9 +156,11 @@ export class StackView {
   clear(): void {
     for (const strip of this.strips) {
       strip.group.traverse((child) => {
-        if (child instanceof Mesh) {
+        if (isMesh(child)) {
           child.geometry.dispose();
-          (child.material as MeshStandardMaterial).dispose();
+          // Three types Mesh.material as one material or an array of them.
+          const materials = Array.isArray(child.material) ? child.material : [child.material];
+          for (const material of materials) material.dispose();
         }
       });
       this.group.remove(strip.group);
@@ -225,7 +230,7 @@ export class ByteGrid {
       const base = i < headerLength ? headerColor : payloadColor;
       // Byte value modulates brightness, so the data has visible texture rather
       // than being a flat block of colour.
-      const shade = 0.55 + (bytes[i]! / 255) * 0.45;
+      const shade = 0.55 + (bytes[i] / 255) * 0.45;
       this.mesh.setColorAt(i, new Color(base.r * shade, base.g * shade, base.b * shade));
     }
     this.mesh.instanceMatrix.needsUpdate = true;
@@ -261,4 +266,15 @@ export class ByteGrid {
     this.dummy.scale.setScalar(1);
     this.mesh.instanceMatrix.needsUpdate = true;
   }
+}
+
+/**
+ * `child instanceof Mesh` narrows to `Mesh<any, any, any>`: TypeScript
+ * instantiates the type parameters of a generic class with `any` when it
+ * narrows, so every `geometry` and `material` access behind such a check is
+ * silently untyped. Three sets `isMesh` on every mesh, which gives the same
+ * test while keeping the default parameters.
+ */
+function isMesh(object: Object3D): object is Mesh {
+  return (object as Partial<Mesh>).isMesh === true;
 }
