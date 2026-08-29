@@ -17,10 +17,17 @@ load that followed it, twenty-two frames in all.
 - **The hardware addresses are not real.** A MAC address identifies a physical
   network card, so the two that appear were replaced with locally administered
   stand-ins by `scripts/extract.mjs`.
-- **The client address is private.** `192.168.1.169`, behind NAT, which
-  identifies nothing outside the flat it was captured in.
+- **The client address is not real either.** It is `192.168.1.100`, a stand-in
+  written over the private address that was actually there, with the IP header
+  and the TCP and UDP checksums that covered it recomputed from the rewritten
+  bytes. A private address identifies nothing outside the flat it was captured
+  in, and this one was not even in it.
+- **There is no wall clock.** The frames keep their intervals, which is what
+  the simulation reads, but they are pinned to a neutral instant rather than
+  to the evening the capture was taken.
 - **The other endpoints are public services**, contacted by anybody who
-  resolves and loads that page.
+  resolves and loads that page. They are left as they are: hiding a DNS
+  resolver and a web server would only make the capture less checkable.
 
 `fixtures/session.keylog` ships too, and that is deliberate: the decryption you
 watch in the interface is a real AES-GCM operation on the real ciphertext, and
@@ -32,8 +39,8 @@ session with the same server.
 None of that is asserted here and left at that: `tests/published-capture.test.ts`
 checks it against the files in the repository, on every run. If somebody ever
 replaces the fixture with a capture that still carries a manufacturer-assigned
-MAC address, or a key log covering more than the shipped session, the suite
-fails.
+MAC address, a private address that was not rewritten, a real capture time, or
+a key log covering more than the shipped session, the suite fails.
 
 ## What is deliberately not published
 

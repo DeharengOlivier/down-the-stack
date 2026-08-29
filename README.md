@@ -31,10 +31,13 @@ The capture holds 22 frames covering DNS resolution, the TCP three-way
 handshake, a TLS 1.3 handshake whose ClientHello genuinely spans two TCP
 segments, the encrypted request, the response, and the teardown.
 
-That capture ships with the project, in `fixtures/`. The two real MAC addresses
-were replaced with locally administered stand-ins, because a MAC address
-identifies physical hardware. Nothing else in it is personal: the client address
-is private and behind NAT. That is not left as a promise either:
+That capture ships with the project, in `fixtures/`. Three things in it were
+rewritten before publication, because they described a machine and a moment
+rather than a protocol: the two MAC addresses, which identify physical
+hardware; the private address of the client, whose checksums were recomputed
+from the rewritten bytes; and the capture time, rebased so the frames keep
+their intervals without carrying a date. The public endpoints, a DNS resolver
+and a web server, are untouched. That is not left as a promise either:
 `tests/published-capture.test.ts` checks the published files on every run, and
 [SECURITY.md](SECURITY.md) says exactly what they expose.
 

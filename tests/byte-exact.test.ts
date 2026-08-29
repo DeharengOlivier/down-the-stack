@@ -17,7 +17,7 @@ import { aRecordData, encodeDns } from '../src/core/protocols/dns';
 
 const CLIENT_MAC = '02:1a:2b:3c:4d:5e';
 const GATEWAY_MAC = '02:aa:bb:cc:dd:ee';
-const CLIENT_IP = '192.168.1.169';
+const CLIENT_IP = '192.168.1.100';
 const RESOLVER_IP = '1.1.1.1';
 const SERVER_IP = '172.66.147.243';
 
