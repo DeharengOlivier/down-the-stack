@@ -11,8 +11,10 @@ import {
   MeshStandardMaterial,
   Vector3,
 } from 'three';
+import type { Sprite } from 'three';
 import type { Hop } from '../core/scenario/journey';
 import { createLabel, updateLabel } from './labels';
+import { disposeSubtree } from './dispose';
 import { LAYER_COLORS } from './palette';
 import { t } from '../content';
 
@@ -46,8 +48,8 @@ export class WorldView {
   private packet = new Group();
   private shell!: Mesh;
   private core!: Mesh;
-  private ttlLabel = createLabel('TTL 64', { color: LAYER_COLORS[3], size: 34 });
-  private mediumLabel = createLabel('', { color: '#e8eefc', size: 34 });
+  private ttlLabel!: Sprite;
+  private mediumLabel!: Sprite;
 
   constructor() {
     this.group.visible = false;
@@ -55,7 +57,7 @@ export class WorldView {
 
   setHops(hops: Hop[]): void {
     this.hops = hops;
-    this.group.clear();
+    disposeSubtree(this.group);
 
     hops.forEach((hop, index) => {
       const isEndpoint = index === 0 || index === hops.length - 1;
@@ -126,10 +128,14 @@ export class WorldView {
     this.shell.renderOrder = 1;
     this.packet.add(this.shell);
 
+    // Rebuilt with the packet rather than kept across rebuilds: a sprite that
+    // outlives the subtree it belongs to cannot be released with it.
+    this.ttlLabel = createLabel('TTL 64', { color: LAYER_COLORS[3], size: 34 });
     this.ttlLabel.position.set(0, 2.2, 0);
     this.ttlLabel.center.set(0.5, 0.5);
     this.packet.add(this.ttlLabel);
 
+    this.mediumLabel = createLabel('', { color: '#e8eefc', size: 34 });
     this.mediumLabel.position.set(0, -1.75, 0);
     this.mediumLabel.center.set(0.5, 0.5);
     this.packet.add(this.mediumLabel);

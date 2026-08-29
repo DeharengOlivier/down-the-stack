@@ -11,6 +11,7 @@ import type { BufferGeometry } from 'three';
 import type { LayerView } from '../core/scenario/journey';
 import { colorFor } from './palette';
 import { createLabel, updateLabel } from './labels';
+import { disposeSubtree } from './dispose';
 import { t } from '../content';
 
 /**
@@ -155,14 +156,10 @@ export class StackView {
 
   clear(): void {
     for (const strip of this.strips) {
-      strip.group.traverse((child) => {
-        if (isMesh(child)) {
-          child.geometry.dispose();
-          // Three types Mesh.material as one material or an array of them.
-          const materials = Array.isArray(child.material) ? child.material : [child.material];
-          for (const material of materials) material.dispose();
-        }
-      });
+      // Not only the segment meshes: each strip also carries two label
+      // sprites, and a label owns a canvas texture worth a couple of hundred
+      // kilobytes of GPU memory.
+      disposeSubtree(strip.group);
       this.group.remove(strip.group);
     }
     this.strips = [];
@@ -266,15 +263,4 @@ export class ByteGrid {
     this.dummy.scale.setScalar(1);
     this.mesh.instanceMatrix.needsUpdate = true;
   }
-}
-
-/**
- * `child instanceof Mesh` narrows to `Mesh<any, any, any>`: TypeScript
- * instantiates the type parameters of a generic class with `any` when it
- * narrows, so every `geometry` and `material` access behind such a check is
- * silently untyped. Three sets `isMesh` on every mesh, which gives the same
- * test while keeping the default parameters.
- */
-function isMesh(object: Object3D): object is Mesh {
-  return (object as Partial<Mesh>).isMesh === true;
 }

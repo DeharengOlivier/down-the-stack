@@ -18,6 +18,7 @@ import type { Journey } from '../core/scenario/journey';
 import type { Station, TimelineState } from '../timeline/timeline';
 import { BACKGROUND } from './palette';
 import { ByteGrid, StackView } from './stack-view';
+import { disposeSubtree } from './dispose';
 import { WorldView } from './world-view';
 import { PhyView } from './phy-view';
 
@@ -251,6 +252,11 @@ export function createScene(canvas: HTMLCanvasElement, journey: Journey): SceneH
     dispose: () => {
       canvas.removeEventListener('pointerdown', pick);
       stackView.clear();
+      // The other three views hold geometry and label textures of their own,
+      // which the renderer does not know about and will not free.
+      disposeSubtree(byteGrid.group);
+      disposeSubtree(worldView.group);
+      disposeSubtree(phyView.group);
       composer.dispose();
       renderer.dispose();
     },

@@ -15,6 +15,7 @@ import {
 import type { OfdmResult } from '../core/phy/ofdm';
 import { DATA_INDICES, FFT_SIZE, PILOT_INDICES } from '../core/phy/ofdm';
 import { createLabel } from './labels';
+import { disposeSubtree } from './dispose';
 import { t } from '../content';
 
 /**
@@ -67,7 +68,7 @@ export class PhyView {
   }
 
   setResult(result: OfdmResult): void {
-    this.group.clear();
+    disposeSubtree(this.group);
     this.groups = {};
 
     this.buildBits(result);
