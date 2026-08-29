@@ -50,6 +50,35 @@ export interface SceneHandle {
   dispose(): void;
 }
 
+/** Vertical field of view the camera was framed with, on a wide screen. */
+export const DESIGN_FOV = 45;
+
+/** The aspect ratio every camera pose in this file was chosen against. */
+export const DESIGN_ASPECT = 16 / 9;
+
+/**
+ * The vertical field of view that keeps the HORIZONTAL one constant.
+ *
+ * Three.js holds the vertical angle fixed and lets the horizontal one follow
+ * the aspect ratio. That is the wrong way round for this scene: the stack, the
+ * hops and the waveform all extend sideways, so on a phone, where the canvas
+ * is nearly square, a fixed vertical angle quietly cropped the width and left
+ * the content stranded in the middle of an empty frame.
+ *
+ * Below the design aspect the vertical angle opens up by exactly the ratio
+ * needed to hold the horizontal extent still. At or above it, nothing changes,
+ * so the desktop framing is untouched.
+ *
+ * @param aspect width / height of the canvas.
+ * @returns a vertical field of view in degrees.
+ */
+export function verticalFovFor(aspect: number): number {
+  if (!Number.isFinite(aspect) || aspect <= 0 || aspect >= DESIGN_ASPECT) return DESIGN_FOV;
+  const designHalf = Math.tan((DESIGN_FOV * Math.PI) / 360);
+  const openedHalf = (designHalf * DESIGN_ASPECT) / aspect;
+  return (2 * Math.atan(openedHalf) * 180) / Math.PI;
+}
+
 export function createScene(canvas: HTMLCanvasElement, journey: Journey): SceneHandle {
   const renderer = new WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
   renderer.setClearColor(new Color(BACKGROUND), 1);
@@ -57,7 +86,7 @@ export function createScene(canvas: HTMLCanvasElement, journey: Journey): SceneH
   const scene = new Scene();
   scene.fog = new Fog(new Color(BACKGROUND), 60, 190);
 
-  const camera = new PerspectiveCamera(45, 1, 0.1, 400);
+  const camera = new PerspectiveCamera(DESIGN_FOV, 1, 0.1, 400);
   camera.position.set(10, 2, 52);
 
   scene.add(new AmbientLight(0xffffff, 0.55));
@@ -198,6 +227,7 @@ export function createScene(canvas: HTMLCanvasElement, journey: Journey): SceneH
     composer.setSize(width, height);
     bloom.resolution.set(width, height);
     camera.aspect = width / height;
+    camera.fov = verticalFovFor(camera.aspect);
     camera.updateProjectionMatrix();
   }
 
