@@ -129,3 +129,36 @@ export function fromHex(hex: string): Uint8Array {
   for (let i = 0; i < out.length; i++) out[i] = parseInt(clean.slice(i * 2, i * 2 + 2), 16);
   return out;
 }
+
+/**
+ * Refuses a buffer too short to hold the header about to be read from it.
+ *
+ * Reading past the end of a typed array is not an error in JavaScript, it is
+ * `undefined`, which flows onwards as NaN through arithmetic and as the word
+ * "undefined" through a template. A parser that does not check first does not
+ * fail: it produces a complete, confident, wrong description.
+ *
+ * This is the boundary of the whole project. Every byte the simulation shows
+ * comes through one of the describe functions, and a frame can be short for
+ * ordinary reasons, a capture stopped mid-write among them. Past this check
+ * the parsers index freely, which is the point of checking once.
+ *
+ * @param protocol Named in the message, so the caller learns which layer.
+ * @param bytes The buffer being parsed.
+ * @param byteOffset Where this header starts inside it.
+ * @param needed Bytes the fixed part of the header occupies.
+ * @throws RangeError when fewer than `needed` bytes remain after the offset.
+ */
+export function requireBytes(
+  protocol: string,
+  bytes: Uint8Array,
+  byteOffset: number,
+  needed: number,
+): void {
+  const available = bytes.length - byteOffset;
+  if (available < needed) {
+    throw new RangeError(
+      `${protocol}: need ${needed} bytes at offset ${byteOffset}, only ${Math.max(0, available)} available`,
+    );
+  }
+}

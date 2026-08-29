@@ -1,5 +1,5 @@
 import type { Field, Header } from '../types';
-import { ByteWriter, formatIpv4, parseIpv4, readU16 } from '../bytes/writer';
+import { ByteWriter, formatIpv4, parseIpv4, readU16, requireBytes } from '../bytes/writer';
 import { internetChecksum } from '../bytes/checksum';
 
 export const IP_PROTO = { ICMP: 1, TCP: 6, UDP: 17 } as const;
@@ -42,6 +42,7 @@ export function encodeIpv4(f: Ipv4Fields): Uint8Array {
 }
 
 export function describeIpv4(bytes: Uint8Array, byteOffset = 0): Header {
+  requireBytes('ipv4', bytes, byteOffset, IPV4_HEADER_BYTES);
   const b = bytes.subarray(byteOffset);
   const ihl = b[0] & 0x0f;
   const totalLength = readU16(b, 2);
@@ -194,6 +195,12 @@ export function describeIpv4(bytes: Uint8Array, byteOffset = 0): Header {
 
 /** True when the header's own checksum validates, which is the receiver's test. */
 export function ipv4ChecksumValid(bytes: Uint8Array, byteOffset = 0): boolean {
+  // A buffer too short to hold the header cannot have a valid checksum, and
+  // saying so is the answer. This function returns a verdict rather than
+  // throwing, so a truncated frame is reported as failing its checksum, which
+  // is exactly what it is.
+  if (bytes.length - byteOffset < IPV4_HEADER_BYTES) return false;
   const ihl = (bytes[byteOffset] & 0x0f) * 4;
+  if (ihl < IPV4_HEADER_BYTES || bytes.length - byteOffset < ihl) return false;
   return internetChecksum(bytes.subarray(byteOffset, byteOffset + ihl)) === 0;
 }

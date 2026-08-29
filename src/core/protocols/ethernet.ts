@@ -1,5 +1,5 @@
 import type { Field, Header } from '../types';
-import { ByteWriter, formatMac, parseMac, readU16 } from '../bytes/writer';
+import { ByteWriter, formatMac, parseMac, readU16, requireBytes } from '../bytes/writer';
 
 export const ETHERTYPE = { IPV4: 0x0800, ARP: 0x0806, IPV6: 0x86dd } as const;
 
@@ -64,6 +64,7 @@ function macFields(bytes: Uint8Array, offset: number, prefix: string, label: str
 }
 
 export function describeEthernet(bytes: Uint8Array, byteOffset = 0): Header {
+  requireBytes('ethernet', bytes, byteOffset, ETHERNET_HEADER_BYTES);
   const b = bytes.subarray(byteOffset);
   const etherType = readU16(b, 12);
   return {

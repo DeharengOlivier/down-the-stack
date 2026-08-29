@@ -1,5 +1,5 @@
 import type { Field, Header } from '../types';
-import { ByteWriter, parseIpv4, readU16, readU32 } from '../bytes/writer';
+import { ByteWriter, parseIpv4, readU16, readU32, requireBytes } from '../bytes/writer';
 import { checksumParts, ipv4PseudoHeader } from '../bytes/checksum';
 import { IP_PROTO } from './ipv4';
 
@@ -170,6 +170,7 @@ function describeOptions(b: Uint8Array, start: number, end: number): Field[] {
 }
 
 export function describeTcp(bytes: Uint8Array, byteOffset = 0): Header {
+  requireBytes('tcp', bytes, byteOffset, TCP_MIN_HEADER_BYTES);
   const b = bytes.subarray(byteOffset);
   const dataOffsetWords = b[12] >> 4;
   const headerBytes = dataOffsetWords * 4;

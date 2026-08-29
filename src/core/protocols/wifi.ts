@@ -1,5 +1,5 @@
 import type { Field, Header } from '../types';
-import { ByteWriter, formatMac, parseMac, readU16 } from '../bytes/writer';
+import { ByteWriter, formatMac, parseMac, readU16, requireBytes } from '../bytes/writer';
 import { crc32 } from '../bytes/checksum';
 
 /**
@@ -78,6 +78,7 @@ export function encodeWifi(f: WifiFields, payload: Uint8Array): Uint8Array {
 }
 
 export function describeWifi(bytes: Uint8Array, byteOffset = 0): Header {
+  requireBytes('wifi', bytes, byteOffset, WIFI_HEADER_BYTES + LLC_SNAP_BYTES);
   const b = bytes.subarray(byteOffset);
   const type = (b[0] >> 2) & 0x03;
   const subtype = (b[0] >> 4) & 0x0f;

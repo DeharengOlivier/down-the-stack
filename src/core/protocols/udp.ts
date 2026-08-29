@@ -1,5 +1,5 @@
 import type { Header } from '../types';
-import { ByteWriter, parseIpv4, readU16 } from '../bytes/writer';
+import { ByteWriter, parseIpv4, readU16, requireBytes } from '../bytes/writer';
 import { checksumParts, ipv4PseudoHeader } from '../bytes/checksum';
 import { IP_PROTO } from './ipv4';
 
@@ -29,6 +29,7 @@ export function encodeUdp(f: UdpFields, payload: Uint8Array): Uint8Array {
 }
 
 export function describeUdp(bytes: Uint8Array, byteOffset = 0): Header {
+  requireBytes('udp', bytes, byteOffset, UDP_HEADER_BYTES);
   const b = bytes.subarray(byteOffset);
   const srcPort = readU16(b, 0);
   const dstPort = readU16(b, 2);

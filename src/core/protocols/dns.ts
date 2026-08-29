@@ -1,5 +1,8 @@
 import type { Field, Header } from '../types';
-import { ByteWriter, formatIpv4, parseIpv4, readU16, readU32 } from '../bytes/writer';
+import { ByteWriter, formatIpv4, parseIpv4, readU16, readU32, requireBytes } from '../bytes/writer';
+
+/** Transaction id, flags, and the four section counts. */
+export const DNS_HEADER_BYTES = 12;
 
 export const DNS_TYPE: Record<number, string> = { 1: 'A', 2: 'NS', 5: 'CNAME', 16: 'TXT', 28: 'AAAA' };
 export const DNS_CLASS: Record<number, string> = { 1: 'IN' };
@@ -85,6 +88,7 @@ export function readName(b: Uint8Array, offset: number): { name: string; length:
 }
 
 export function describeDns(bytes: Uint8Array, byteOffset = 0): Header {
+  requireBytes('dns', bytes, byteOffset, DNS_HEADER_BYTES);
   const b = bytes.subarray(byteOffset);
   const id = readU16(b, 0);
   const flags = readU16(b, 2);
