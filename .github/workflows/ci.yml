@@ -37,6 +37,12 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
+      - name: Smoke test the built page in a real browser
+        # Nothing else in the suite can see WebGL: node has no canvas. This
+        # loads the production build in the Chrome the runner ships, on a
+        # software rasteriser, and checks that the scene starts, the timeline
+        # runs and the keyboard controls it.
+        run: node scripts/smoke.mjs
 
   audit:
     name: Dependency advisories

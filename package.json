@@ -13,6 +13,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
+    "smoke": "npm run build && node scripts/smoke.mjs",
     "capture": "node scripts/capture.mjs && node scripts/extract.mjs"
   },
   "dependencies": {

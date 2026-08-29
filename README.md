@@ -119,6 +119,7 @@ npm test           # 224 tests: byte-exactness, round trips, timeline, fixtures
 npm run typecheck
 npm run lint
 npm run build
+npm run smoke       # loads the built page in a headless Chrome and drives it
 ```
 
 The interface is built for a 375px screen first and gains its side-by-side
